@@ -1,6 +1,4 @@
 import "./App.css";
-// import { useContext } from "react";
-import { UserInfoContext } from "./components/userInfo/UserInfoContexts";
 import {
   BrowserRouter,
   Navigate,
@@ -12,14 +10,14 @@ import Login from "./components/authentication/login/Login";
 import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
-import FolloweesScroller from "./components/mainLayout/FolloweesScroller";
-import FollowersScroller from "./components/mainLayout/FollowersScroller";
-import FeedScroller from "./components/mainLayout/FeedScroller";
-import StoryScroller from "./components/mainLayout/StoryScroller";
+
 import { useUserInfo } from "./components/userInfo/UserInfoHooks";
 import UserItemScroller from "./components/userItem/UserItemScroller";
 import StatusItemScroller from "./components/statusItem/StatusItemScroller";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
+import { UserItemView } from "./presenter/UserItemPresenter";
+import { FolloweePresenter } from "./presenter/FolloweePresenter";
+import { FollowerPresenter } from "./presenter/FollowerPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -63,24 +61,6 @@ const AuthenticatedRoutes = () => {
     return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
   };
 
-  const loadMoreFollowees = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastFollowee: User | null
-  ): Promise<[User[], boolean]> => {
-    return FakeData.instance.getPageOfUsers(lastFollowee, pageSize, userAlias);
-  };
-
-  const loadMoreFollowers = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastFollower: User | null
-  ): Promise<[User[], boolean]> => {
-    return FakeData.instance.getPageOfUsers(lastFollower, pageSize, userAlias);
-  };
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -115,8 +95,7 @@ const AuthenticatedRoutes = () => {
           <UserItemScroller 
             key={`followees-${displayedUser!.alias}`}
             featurePath="/followees"
-            itemDescription="followees"
-            loadMoreItems={loadMoreFollowees}
+            presenterFactory={(view: UserItemView) => new FolloweePresenter(view)}
             />
           }
           />
@@ -127,8 +106,7 @@ const AuthenticatedRoutes = () => {
           <UserItemScroller 
             key={`followers-${displayedUser!.alias}`}
             featurePath="/followers"
-            itemDescription="followers"
-            loadMoreItems={loadMoreFollowers}
+            presenterFactory={(view: UserItemView) => new FollowerPresenter(view)}
             />
           }
           />
