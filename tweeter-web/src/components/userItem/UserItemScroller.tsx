@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
-import { User } from "tweeter-shared";
+import { AuthToken, User } from "tweeter-shared";
 import { ToastType } from "../toaster/Toast";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
@@ -61,6 +61,13 @@ const UserItemScroller = (props: Props) => {
 
   const loadMoreItems = async () => {
     presenterRef.current!.loadMoreItems(authToken!, displayedUser!.alias)
+  }; 
+
+  const getUser = async (
+    authToken: AuthToken,
+    alias: string
+  ): Promise<User | null> => {
+    return presenterRef.current!.getUser(authToken, alias);
   };
 
   return (
