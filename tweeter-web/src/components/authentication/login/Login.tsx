@@ -40,7 +40,7 @@ const Login = (props: Props) => {
   }
 
   const checkSubmitButtonStatus = (): boolean => {
-    return presenterRef.current!.checkSubmitButtonStatus(alias, password);
+    return !alias || !password;
   };
 
   const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
