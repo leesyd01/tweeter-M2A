@@ -18,4 +18,17 @@ export class FollowService {
       ): Promise<[User[], boolean]> {
         return FakeData.instance.getPageOfUsers(lastFollower, pageSize, userAlias);
       };
+
+      // followee count
+
+      // follower count
+
+      // follow
+
+      // unfollow
 }
+
+export class IsFollowerService {
+
+}
+

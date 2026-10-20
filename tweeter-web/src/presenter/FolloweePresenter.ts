@@ -17,8 +17,6 @@ export class FolloweePresenter extends UserItemPresenter {
         this.service = new FollowService();
     }
 
-    
-
     public async loadMoreItems(authToken: AuthToken, userAlias: string) {
         try {
             const [newItems, hasMore] = await this.service.loadMoreFollowees(

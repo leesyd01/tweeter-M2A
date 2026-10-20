@@ -4,10 +4,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthenticationFields";
-import { AuthToken, FakeData, User } from "tweeter-shared";
+// import { AuthToken, FakeData, User } from "tweeter-shared";
 import { ToastType } from "../../toaster/Toast";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
+import { LoginPresenter, LoginView } from "../../../presenter/LoginPresenter";
+import { useRef } from "react";
 
 interface Props {
   originalUrl?: string;
@@ -23,8 +25,22 @@ const Login = (props: Props) => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayToast } = useMessageActions();
 
+  const listener: LoginView = {
+    setIsLoading: (isLoading: boolean) => setIsLoading(isLoading),
+    displayErrorMessage: (message: string) =>
+      displayToast(ToastType.Error, message, 0),
+    updateUserInfo: (currentUser, displayedUser, authToken, remember) =>
+      updateUserInfo(currentUser, displayedUser, authToken, remember),
+    navigate: (url: string) => navigate(url),
+  };
+
+  const presenterRef = useRef<LoginPresenter | null>(null);
+  if (!presenterRef.current) {
+    presenterRef.current = new LoginPresenter(listener);
+  }
+
   const checkSubmitButtonStatus = (): boolean => {
-    return !alias || !password;
+    return presenterRef.current!.checkSubmitButtonStatus(alias, password);
   };
 
   const loginOnEnter = (event: React.KeyboardEvent<HTMLElement>) => {
@@ -33,43 +49,11 @@ const Login = (props: Props) => {
     }
   };
 
-  const doLogin = async () => {
-    try {
-      setIsLoading(true);
-
-      const [user, authToken] = await login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate(`/feed/${user.alias}`);
-      }
-    } catch (error) {
-      displayToast(
-        ToastType.Error,
-        `Failed to log user in because of exception: ${error}`,
-        0
-      );
-    } finally {
-      setIsLoading(false);
-    }
+  const doLogin = () => {
+    presenterRef.current!.login(alias, password, rememberMe, props.originalUrl);
   };
 
-  const login = async (
-    alias: string,
-    password: string
-  ): Promise<[User, AuthToken]> => {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };
+  // inputFieldFactory, switchAuthenticationMethodFactory, and the return stay the same
 
   const inputFieldFactory = () => {
     return (
