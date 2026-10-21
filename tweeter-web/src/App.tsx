@@ -14,10 +14,12 @@ import Toaster from "./components/toaster/Toaster";
 import { useUserInfo } from "./components/userInfo/UserInfoHooks";
 import UserItemScroller from "./components/userItem/UserItemScroller";
 import StatusItemScroller from "./components/statusItem/StatusItemScroller";
-import { AuthToken, FakeData, Status, User } from "tweeter-shared";
 import { UserItemView } from "./presenter/UserItemPresenter";
 import { FolloweePresenter } from "./presenter/FolloweePresenter";
 import { FollowerPresenter } from "./presenter/FollowerPresenter";
+import { StatusItemView } from "./presenter/StatusItemPresenter";
+import { FeedPresenter } from "./presenter/FeedPresenter";
+import { StoryPresenter } from "./presenter/StoryPresenter";
 
 const App = () => {
   const { currentUser, authToken } = useUserInfo();
@@ -43,24 +45,6 @@ const App = () => {
 const AuthenticatedRoutes = () => {
   const { displayedUser } = useUserInfo();
 
-  const loadMoreFeedItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
-  const loadMoreStoryItems = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> => {
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
-
   return (
     <Routes>
       <Route element={<MainLayout />}>
@@ -71,8 +55,7 @@ const AuthenticatedRoutes = () => {
           <StatusItemScroller 
             key={`feed-${displayedUser!.alias}`}
             featurePath="/feed"
-            itemDescription="feed"
-            loadMoreItems={loadMoreFeedItems} 
+            presenterFactory={(view: StatusItemView) => new FeedPresenter(view)}
             />
           }
           />
@@ -83,8 +66,7 @@ const AuthenticatedRoutes = () => {
           <StatusItemScroller 
             key={`story-${displayedUser!.alias}`}
             featurePath="/story"
-            itemDescription="story"
-            loadMoreItems={loadMoreStoryItems}
+            presenterFactory={(view: StatusItemView) => new StoryPresenter(view)}
             />
           }
           />
