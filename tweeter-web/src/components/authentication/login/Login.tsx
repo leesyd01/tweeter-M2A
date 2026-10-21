@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthenticationFields";
-// import { AuthToken, FakeData, User } from "tweeter-shared";
 import { ToastType } from "../../toaster/Toast";
 import { useMessageActions } from "../../toaster/MessageHooks";
 import { useUserInfoActions } from "../../userInfo/UserInfoHooks";
